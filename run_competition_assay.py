@@ -24,26 +24,29 @@ os.environ['GRB_LICENSE_FILE']='/Library/gurobi1003/macos_universal2/gurobi.lic'
 #
 #wt = c.model(test.create_test_model("ecoli"))
 #ecoli_model = load_model("iJO1366")
-ec = c.model(read_sbml_model('ecoli_k12_mg1655.xml'))
+
+#here we load the metabolic network as a cometspy object
+#ec = c.model(load_model("iJO1366"))
+ec = c.model(read_sbml_model('network_files/ecoli_k12_mg1655.xml'))
 #bs = c.model(read_sbml_model('bacillus_subtilis.xml'))
 ec.id = 'ecoli'
 X = -10 
 
-
-ec.change_bounds('EX_succ_e', -20,1000)
+#
+ec.change_bounds('EX_succ_e', -10,1000)
 ec.change_bounds('EX_glc__D_e',X,1000)
 
 bs = c.model(load_model("iYO844"))
 bs.id = 'bsubtilis'
-bs.change_bounds('EX_succ_e', -X,1000)
-bs.change_bounds('EX_glc__D_e',-20,1000)
+bs.change_bounds('EX_succ_e', X,1000)
+bs.change_bounds('EX_glc__D_e',-10,1000)
 
 
 # set its initial biomass, 5e-6 gr at coordinate [0,0]
 ec.initial_pop = [0, 0, 5e-6]
 bs.initial_pop = [0, 0, 5e-6]
 
-# create an empty layout
+# create an empty layout - this is the environment we define what is in it - strains of bacteria and food sources
 test_tube = c.layout()
 
 # add the models to the test tube
@@ -56,9 +59,8 @@ glc_molarmass = 180.156
 succ_molarmass = 118.09
 glc_conc = 0.1 # mol/L
 succ_conc = 0.1 # mol/L
-glc_gram = glc_conc*glc_molarmass*0.001
-succ_gram = succ_conc*succ_molarmass*0.001 #1mL=1cm^3
 
+#setting concentration of food (carbon) sources
 test_tube.set_specific_metabolite('succ_e', succ_conc)
 test_tube.set_specific_metabolite('glc__D_e', glc_conc)
 #test_tube.set_specific_metabolite('lac__D_e', glc_conc)
@@ -67,19 +69,18 @@ test_tube.set_specific_metabolite('glc__D_e', glc_conc)
 
 
 # Add typical trace metabolites and oxygen coli as static
-
 trace_metabolites = ['ca2_e', 'cl_e', 'cobalt2_e', 'cu2_e', 'fe2_e', 'fe3_e', 'h_e', 'k_e', 'h2o_e', 'mg2_e',
                      'mn2_e', 'mobd_e', 'na1_e', 'ni2_e', 'nh4_e', 'o2_e', 'pi_e', 'so4_e', 'zn2_e']
-max_time = 240
 for i in trace_metabolites:
     test_tube.set_specific_metabolite(i, 1000)
     test_tube.set_specific_static(i, 1000)
     
+max_time = 240    
 comp_params = c.params()
 comp_params.set_param('maxCycles', max_time)
 comp_params.set_param('writeMediaLog', True)
 #comp_params.set_param('writeFluxLog', True)
-comp_params.set_param('FluxLogRate',1)
+#comp_params.set_param('FluxLogRate',1)
 comp_params.set_param('MediaLogRate',1)
 
 comp_assay = c.comets(test_tube, comp_params)
@@ -95,8 +96,6 @@ myplot.set_yscale('log')
 myplot.legend([ec.id,bs.id])
 
 m_wt = np.log(biomass.ecoli[max_time]/biomass.ecoli[0])
-y_glc = biomass.ecoli[max_time] / glc_gram
-print('Yield=',y_glc)
 #m_mut = np.log(biomass.succ_KO[240]/biomass.succ_KO[0])
 
 media = comp_assay.media.copy()
@@ -108,10 +107,10 @@ ac_ts = media[media['metabolite']=='ac_e']
 carbons = pd.concat([glc_ts, succ_ts, ac_ts])
 
 fig, ax = plt.subplots()
-media.groupby('metabolite',sort=False).plot(x='cycle', ax =ax, y='conc_mmol')
+carbons.groupby('metabolite',sort=False).plot(x='cycle', ax =ax, y='conc_mmol')
 ax.set_xlim((0,max_time))
 #ax.legend(('glucose','succinate','acetate'))
-ax.legend(media.metabolite.unique())
+ax.legend(carbons.metabolite.unique())
 ax.set_ylabel("Concentration (mmol)")
 """
 wt_df = comp_assay.fluxes_by_species['wt']

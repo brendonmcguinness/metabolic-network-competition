@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from helpers import nicheOverlapSaveTimeSeriesMultipleChooseTime, returnSCMatrix
 
 exchange_rxns = ["EX_glc__D_e", "EX_xyl__D_e"]
-exchange_rxns = ["EX_glc__D_e", "EX_succ_e"]
+#exchange_rxns = ["EX_glc__D_e", "EX_succ_e"]
 #exchange_rxns = ["EX_glc__D_e", "EX_fru_e"]
 
 
@@ -20,8 +20,10 @@ exchange_rxns = ["EX_glc__D_e", "EX_succ_e"]
 # concentrations: both at 0.1
 s1_conc = np.array([0.1])
 s2_conc = np.array([0.1])
-mut1 = c.model(read_sbml_model('ecoli_k12_mg1655.xml'))
+#mut1 = c.model(read_sbml_model('network_files/ecoli_k12_mg1655.xml'))
 #bs = c.model(read_sbml_model('bacillus_subtilis.xml'))
+mut1 = c.model(load_model("iJO1366"))
+
 mut2 = c.model(load_model("iYO844"))
 # cross-bound non-target rxns to zero
 ko1=-5
@@ -43,7 +45,7 @@ mut2.id = "bsubtilis"
 mut1.change_bounds(source1, ko1, 1000)
 mut2.change_bounds(source2, ko2, 1000)
 
-M = 11
+M = 2
 s_wt, s_mut, wt_freq, media_list = returnSCMatrix(mut1,mut2,source1,source2,s1_conc,s2_conc,N=M,init_ratio_diff = 1e-3, init_mean_pop=5e-6)
 
 R1 = []
