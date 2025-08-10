@@ -6,6 +6,20 @@ Created on Wed Jul  9 15:00:27 2025
 @author: mariepyun
 """
 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun  4 12:53:38 2025
+
+@author: brendonmcguinness
+"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 12 14:09:44 2025
+Refactored to isolate COMETS runs via chdir, add error handling,
+avoid Decimal keys, load base model once, and clean up workspaces.
+"""
 
 import os
 import shutil
