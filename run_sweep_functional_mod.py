@@ -6,20 +6,6 @@ Created on Wed Jul  9 15:00:27 2025
 @author: mariepyun
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jun  4 12:53:38 2025
-
-@author: brendonmcguinness
-"""
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 12 14:09:44 2025
-Refactored to isolate COMETS runs via chdir, add error handling,
-avoid Decimal keys, load base model once, and clean up workspaces.
-"""
 
 import os
 import shutil
@@ -61,7 +47,7 @@ network_pairs = [#('network_files/senterica.xml', 'network_files/vcholerae.xml')
                 ]
 
 
-ko_bounds   = np.arange(-10, 1)  # -10, -9, …, 0
+ko_bounds   = np.arange(-10, 1)  # -10, -9, …, 0 ##TO 1
 #ko_bounds   = np.array([-10,-3,-2,-1,0])
 M           = 2
 s1_conc     = np.linspace(0.005, 0.05, M)
@@ -101,8 +87,8 @@ def save_results_to_csv(results, fname): #Added some columns to the table so tha
                 "Carbon Source 1": src1,
                 "Carbon Source 2": src2,
                 "Concentration of CS1": float(conc_str), #Specified that we will be referring to carbon source 1 when we write the concentration (concentraton of cs2 can be deduced as they add up to 0.055)
-                "KO Bound Source 1 on S. enterica": ko1, #Specified that I will be writing the ko bounds on network1 (not network2, but the bounds on network2 can be inferred. For ex: if we have that network 1 has bounds -10, -3, then we know network 2 has bound -3, -10. Just by design of the setup_mutants() function.)
-                "KO Bound Source 2 on S. enterica": ko2,
+                "KO Bound Source 1 on Network 1": ko1, #Specified that I will be writing the ko bounds on network1 (not network2, but the bounds on network2 can be inferred. For ex: if we have that network 1 has bounds -10, -3, then we know network 2 has bound -3, -10. Just by design of the setup_mutants() function.)
+                "KO Bound Source 2 on Network 2": ko2,
                 "KO Strain Index": (idx % 2) + 1,
                 "Value": v,
                 "Trial #": counter
@@ -120,10 +106,10 @@ def setup_mutants(base1, base2, net1, net2, s1, s2, ko1, ko2, cross_bound, rxns)
         mut2.change_bounds(r, cross_bound, 1000)
     mut1_name = net1.split('/')[-1].split('.')[0] #Remove all the extra stuff from the network file path, and only keep the file name
     mut2_name = net2.split('/')[-1].split('.')[0] #Remove all the extra stuff from the network file path, and only keep the file name
-    mut1.id = f"{mut1_name}_{s1}_KO_{ko1}"
+    mut1.id = f"{mut1_name}"
     mut1.change_bounds(s1, ko1, 1000)
     mut1.change_bounds(s2, -10, 1000)
-    mut2.id = f"{mut2_name}_{s2}_KO_{ko2}"
+    mut2.id = f"{mut2_name}"
     mut2.change_bounds(s2, ko2, 1000)
     mut2.change_bounds(s1, -10, 1000)
     return mut1, mut2, mut1.id, mut2.id
@@ -173,10 +159,10 @@ for network1, network2 in network_pairs:
                     counter += 1 
                     
                     if i == 0: #Make the keys correctly (recall that for the key, I am writing ko1 and ko2 bounds based on the uptake capacities of s. enterica)
-                        key = make_key(mut1_id, mut2_id, s1_name, s2_name, conc1, ko, -10, counter) #If i == 0, then s. enterica has uptake capacity ko for carbon source 1 and -10 for carbon source 2, so write the key accordingly
+                        key = make_key(mut1_id, mut2_id, s1_name, s2_name, conc1, ko, ko, counter) #If i == 0, then s. enterica has uptake capacity ko for carbon source 1 and -10 for carbon source 2, so write the key accordingly
                     
                     if i == 1:
-                        key = make_key(mut1_id, mut2_id, s1_name, s2_name, conc1, -10, ko, counter) #If i == 0, then s. enterica has uptake capacity ko for carbon source 2 and -10 for carbon source 1, so write the key accordingly
+                        key = make_key(mut1_id, mut2_id, s1_name, s2_name, conc1, ko, ko, counter) #If i == 0, then s. enterica has uptake capacity ko for carbon source 2 and -10 for carbon source 1, so write the key accordingly
         
         
                     # Niche
