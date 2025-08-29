@@ -101,8 +101,8 @@ def save_results_to_csv(results, fname): #Added some columns to the table so tha
                 "Carbon Source 1": src1,
                 "Carbon Source 2": src2,
                 "Concentration of CS1": float(conc_str), #Specified that we will be referring to carbon source 1 when we write the concentration (concentraton of cs2 can be deduced as they add up to 0.055)
-                "KO Bound Source 1 on S. enterica": ko1, #Specified that I will be writing the ko bounds on network1 (not network2, but the bounds on network2 can be inferred. For ex: if we have that network 1 has bounds -10, -3, then we know network 2 has bound -3, -10. Just by design of the setup_mutants() function.)
-                "KO Bound Source 2 on S. enterica": ko2,
+                "KO Bound Source 1 on Network 1": ko1, #Specified that I will be writing the ko bounds on network1 (not network2, but the bounds on network2 can be inferred. For ex: if we have that network 1 has bounds -10, -3, then we know network 2 has bound -3, -10. Just by design of the setup_mutants() function.)
+                "KO Bound Source 2 on Network 2": ko2, #assume if i does not equal j (network 1 on carbon 2) then -10
                 "KO Strain Index": (idx % 2) + 1,
                 "Value": v,
                 "Trial #": counter
